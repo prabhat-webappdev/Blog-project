@@ -1,0 +1,111 @@
+<h1>Update Blog</h1>
+<br><br>
+<form method="post" enctype="multipart/form-data">
+    <table cellpadding="8px">
+        <tr>
+            <td>Name: </td>
+            <td><input type="text" id="name" placeholder="Enter your name"></td>
+        </tr>
+        <tr>
+            <td>Email: </td>
+            <td><input type="email" id="email" placeholder="Enter your email"></td>
+        </tr>
+        <tr>
+            <td>Password: </td>
+            <td><input type="password" id="password" placeholder="Enter your password"></td>
+        </tr>
+        <tr>
+            <td>Phone: </td>
+            <td><input type="text" id="phone" placeholder="Enter your Phone"></td>
+        </tr>
+        <tr>
+            <td>Course: </td>
+            <td>
+                <% const
+                    courseList=['html','css','bootstrap','javascript','nodejs','photoshop','figma','android','flutter','c','c++','java','php']
+                    %>
+                <% for( let i of courseList ) { %>
+
+                <input type="checkbox" value="<%= i %>" id="<%= i %>" name="course">
+                <label for="<%= i %>">
+                    <%= i %>
+                </label>
+                <% } %>
+            </td>
+        </tr>
+        <tr>
+            <td>fees: </td>
+            <td><input type="text" id="fees" placeholder="Enter your fees"></td>
+        </tr>
+        <tr>
+            <td>Photo : </td>
+            <td>
+                <input type="file" id="avatar">
+                <img width="100" id="showavatar">
+            </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td>
+                <button type="button" onclick="editvalue()">Submit</button>
+                <button type="button" onclick="cancleUpdate()">Cancle</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<script src="../sweetalert.min.js"></script>
+
+<script  src="../axios.min.js"></script>
+<script>
+    axios.defaults.baseURL = '/api/v1/blog'
+    const baseurl = window.location.href
+    const url = baseurl.split('/')
+    const id = url[url.length - 1]
+    const showSingleBlog = async () => {
+        try {
+            const { data: { data: blog } } = await axios.get(`/${id}`)
+
+            document.getElementById('name').value = blog.name
+            document.getElementById('email').value = blog.email
+            document.getElementById('password').value = blog.password
+            document.getElementById('phone').value = blog.phone
+            document.getElementById('fees').value = blog.fees
+            document.getElementById('showavatar').setAttribute('src', `../${blog.image}`)
+            for (let i of blog.course) {
+                document.getElementById(`${i}`).checked = true
+            }
+        } catch (error) {
+            console.error(error)
+            swal("Opps!", "Something went Wrong!", "error");
+        }
+    }
+    showSingleBlog()
+    const cancleUpdate = () => {
+        window.location.href = '/'
+    }
+    const editvalue = async () => {
+        try {
+            const name = document.getElementById('name').value
+            const email = document.getElementById('email').value
+            const password = document.getElementById('password').value
+            const phone = document.getElementById('phone').value
+            const fees = document.getElementById('fees').value
+            const courseList = document.getElementsByName('course')
+            const image = document.getElementById('avatar').files[0]
+            let course = []
+            for (let i of courseList) {
+                if (i.checked) {
+                    course.push(i.value)
+                }
+            }
+            let obj = { name, email, password, phone, fees, course, image }
+            await axios.patch(`/${id}`, obj, { headers: { 'Content-Type': 'multipart/form-data' } })
+            cancleUpdate()
+        } catch (error) {
+            console.error(error)
+            swal("Opps!", "Something went Wrong!", "error");
+        }
+    }
+
+
+</script>

@@ -1,0 +1,167 @@
+<div>
+    <h1 style="display: inline-block;">Blog Project </h1>
+    <h2 style="display: inline-block; margin-left: 50px;"><a href="/user/logout">LogOut</a></h2>
+</div>
+<br><br>
+<form method="post" enctype="multipart/form-data">
+    <table cellpadding="8px">
+        <tr>
+            <td>Name: </td>
+            <td><input type="text" id="name" placeholder="Enter your name"></td>
+        </tr>
+        <tr>
+            <td>Email: </td>
+            <td><input type="email" id="email" placeholder="Enter your email"></td>
+        </tr>
+        <tr>
+            <td>Password: </td>
+            <td><input type="password" id="password" placeholder="Enter your password"></td>
+        </tr>
+        <tr>
+            <td>Phone: </td>
+            <td><input type="text" id="phone" placeholder="Enter your Phone"></td>
+        </tr>
+        <tr>
+            <td>Course: </td>
+            <td>
+                <% const
+                    courseList=['html','css','bootstrap','javascript','nodejs','photoshop','figma','android','flutter','c','c++','java','php']
+                    %>
+                <% for( let i of courseList ) { %>
+
+                <input type="checkbox" value="<%= i %>" id="<%= i %>" name="course">
+                <label for="<%= i %>">
+                    <%= i %>
+                </label>
+                <% } %>
+            </td>
+        </tr>
+        <tr>
+            <td>fees: </td>
+            <td><input type="number" id="fees" placeholder="Enter your fees"></td>
+        </tr>
+        <tr>
+            <td>Photo : </td>
+            <td><input type="file" id="avatar"></td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td><input type="button" onclick="createBlog()" value="Add Data"></td>
+        </tr>
+    </table>
+</form>
+<br><br>
+<table border="1" cellpadding="8px" id="showBlogs">
+
+
+
+</table>
+<script src="./sweetalert.min.js"></script>
+<script src="./axios.min.js"></script>
+<script>
+    axios.defaults.baseURL = '/api/v1/blog'
+
+    const showBlog = async () => {
+        let blogStr = `
+        <tr>
+            <td>Grid</td>
+            <td>Name</td>
+            <td>Email</td>
+            <td>Password</td>
+            <td>Phone</td>
+            <td>Course</td>
+            <td>Fees</td>
+            <td>Photo</td>
+            <td>Action</td>
+        </tr>
+        `
+        try {
+            const { data: { data: blogs } } = await axios.get('/')
+            if (blogs.length == 0) {
+                document.getElementById('showBlogs').innerHTML = ''
+                return
+            }
+            for (let i of blogs) {
+                blogStr += `
+            <tr>
+                <td>${i.grid}</td>
+                <td>${i.name}</td>
+                <td>${i.email}</td>
+                <td>${i.password}</td>
+                <td>${i.phone}</td>
+                <td>${i.course}</td>
+                <td>${i.fees}</td>
+                <td><img src="/${i.image}" width="100" ></td>
+                <td>
+                    <a href="javascript:void(0)" onclick="deleteBlog('${i._id}')">Delete</a> || 
+                    <a href="/update/${i._id}" type="button" >Update</a>
+                    
+                </td>
+            </tr>
+            `
+            }
+            document.getElementById('showBlogs').innerHTML = blogStr
+        } catch (error) {
+            console.error(error)
+            swal("Opps!", "Something went Wrong!", "error");
+        }
+    }
+    showBlog()
+    const createBlog = async () => {
+        try {
+            const name = document.getElementById('name').value
+            const email = document.getElementById('email').value
+            const password = document.getElementById('password').value
+            const phone = document.getElementById('phone').value
+            const fees = document.getElementById('fees').value
+            const image = document.getElementById('avatar').files[0]
+            const courseList = document.getElementsByName('course')
+
+            let course = []
+            for (let i of courseList) {
+                if (i.checked) {
+                    course.push(i.value)
+                }
+            }
+            let obj = { name, email, password, phone, fees, course, image }
+            await axios.post('/', obj, { headers: { 'Content-Type': 'multipart/form-data' } })
+            showBlog()
+            document.getElementById('name').value = null
+            document.getElementById('email').value = null
+            document.getElementById('password').value = null
+            document.getElementById('phone').value = null
+            document.getElementById('fees').value = null
+            document.getElementById('avatar').value = null
+            for (let j of course) {
+                document.getElementById(`${j}`).checked = false
+            }
+            swal("Good job!", "New Blog Created Successfully!", "success");
+        } catch (error) {
+            console.error(error)
+            swal("Opps!", "Something went Wrong!", "error");
+        }
+    }
+
+    const deleteBlog = async (id) => {
+        try {
+            swal({
+                title: "Are you sure?",
+                text: "Once deleted, you will not be able to recover this imaginary file!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then(async (willDelete) => {
+                if (willDelete) {
+                    await axios.delete(`/${id}`)
+                    showBlog()
+                    swal("Good job!", "Blog Deleted Successfully!", "success");
+                } else {
+                    swal("Your imaginary file is safe!");
+                }
+            });
+        } catch (error) {
+            console.error(error)
+            swal("Opps!", "Something went Wrong!", "error");
+        }
+    }
+</script>

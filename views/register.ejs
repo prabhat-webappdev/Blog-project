@@ -1,0 +1,40 @@
+<form method="post" >
+    <table cellpadding="8px">
+        <tr>
+            <td>Name: </td>
+            <td><input type="text" id="name" placeholder="Enter your name"></td>
+        </tr>
+        <tr>
+            <td>Email: </td>
+            <td><input type="email" id="username" placeholder="Enter your email"></td>
+        </tr>
+        <tr>
+            <td>Password: </td>
+            <td><input type="password" id="password" placeholder="Enter your password"></td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td><input type="button" onclick="registerUser()" value="Register"></td>
+        </tr>
+    </table>
+</form>
+<a href="/login">login</a>
+<script src="./sweetalert.min.js"></script>
+
+<script src="./axios.min.js"></script>
+<script>
+    axios.defaults.baseURL = '/user'
+    const registerUser = async () => {
+        try {
+            const name = document.getElementById('name').value
+            const username = document.getElementById('username').value
+            const password = document.getElementById('password').value
+            await axios.post('/register', { name, username, password })
+            swal("Good job!", "User registration Successfully!", "success");
+            setTimeout(() => { window.location.href = '/login' }, 1000)
+        } catch (error) {
+            swal("Opps!", "Something went Wrong!", "error");
+            console.error(error)
+        }
+    }
+</script>
