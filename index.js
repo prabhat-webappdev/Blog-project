@@ -35,7 +35,7 @@ app.use('/user', userRouter)
 app.use('/', checkLogin, homeRouter)
 app.use('/api/v1/blog', checkLogin, blogRouter)
 
-const port = 4545
+const port = process.env.PORT || 4545
 app.listen(port, () => {
     console.log(`Server is start on port ${port}...`);
 })
