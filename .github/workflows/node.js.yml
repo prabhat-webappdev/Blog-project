@@ -26,7 +26,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm i
+    - run: |
+          echo "${{ secrets.ENV_FILE }}" > .env
     - run: pm2 restart Blog-Project
 #     - run: pm2 start Blog-Project 
-    env:
-          CI: true
