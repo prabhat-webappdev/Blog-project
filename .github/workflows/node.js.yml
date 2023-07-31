@@ -25,9 +25,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: touch .env
-    - run: echo MONGO_URI=${{ secrets.MONGO_URI }} >> .env
-    - run: cat .env
     - run: npm i
-    - run: pm2 stop Blog-Project
-    - run: pm2 start Blog-Project
+    - run: pm2 restart Blog-Project
+#     - run: pm2 start Blog-Project 
+    env:
+          CI: true
